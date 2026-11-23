@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Симулятор енергосистеми України (ОЕС) — Проєкт з фізики 11 клас</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="min-h-screen antialiased">
+  <!-- Шапка -->
+  <header class="bg-[#262B31] text-[#EFE5D8] border-b border-[#353C44]">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 py-3.5 sm:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div>
+        <p class="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-[#B8AEA2]">Проєкт з фізики · 11 клас · Інтерактивна модель</p>
+        <h1 class="text-lg sm:text-2xl font-bold tracking-tight text-[#F7F1E8] leading-snug">СИМУЛЯТОР ЕНЕРГОСИСТЕМИ УКРАЇНИ (ОЕС)</h1>
+      </div>
+      <div class="text-[11px] sm:text-xs text-[#C8BEB2] md:text-right">
+        <div>Виконали: Швець Сергій, Артемчук Назар, Качуровська Даша</div>
+        <div class="text-[#9E958A] mt-0.5">ENTSO-E · Номінальна частота 50,00 Гц</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-3.5 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5">
+    <!-- Панель швидких сценаріїв -->
+    <section class="bg-[#F7F1E8] rounded-xl p-3 sm:p-3.5 border border-[#DDD0BE] space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
+      <span class="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#5A544D] sm:mr-1">Сценарії для захисту:</span>
+      <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+        <button type="button" data-preset="normal" class="preset-btn px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-[#262B31] text-[#F7F1E8] hover:bg-[#353C44] transition text-left sm:text-center">
+          1. Нормальний режим (330 кВ)
+        </button>
+        <button type="button" data-preset="peak" class="preset-btn px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition text-left sm:text-center">
+          2. Вечірній пік (спрацювання АЧР)
+        </button>
+        <button type="button" data-preset="fault" class="preset-btn px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition text-left sm:text-center">
+          3. Обрив основної ЛЕП
+        </button>
+        <button type="button" data-preset="lowv" class="preset-btn px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition text-left sm:text-center">
+          4. Передача на 10 кВ (втрати I²R)
+        </button>
+      </div>
+    </section>
+
+    <!-- Верхні KPI метрики -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+      <div class="bg-[#F7F1E8] rounded-xl p-3 sm:p-4 border border-[#DDD0BE]">
+        <div class="flex items-center justify-between gap-1">
+          <span class="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-[#5A544D]">Частота</span>
+          <span id="freqBadge" class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#2E6B4E]/15 text-[#2E6B4E]">НОРМА</span>
+        </div>
+        <div id="kpiFreq" class="text-xl sm:text-3xl font-bold mt-1.5 text-[#1E2226]">50,00 Гц</div>
+        <div id="kpiFreqSub" class="text-[11px] sm:text-xs text-[#5A544D] mt-1">АЧР: &lt; 49,50 Гц</div>
+      </div>
+
+      <div class="bg-[#F7F1E8] rounded-xl p-3 sm:p-4 border border-[#DDD0BE]">
+        <span class="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-[#5A544D]">Баланс (ΔP)</span>
+        <div id="kpiBalance" class="text-xl sm:text-3xl font-bold mt-1.5 text-[#1E2226]">+89 МВт</div>
+        <div id="kpiBalanceSub" class="text-[11px] sm:text-xs text-[#5A544D] mt-1">10 700 / 10 500 МВт</div>
+      </div>
+
+      <div class="bg-[#F7F1E8] rounded-xl p-3 sm:p-4 border border-[#DDD0BE]">
+        <span class="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-[#5A544D]">Втрати (10 МВт)</span>
+        <div id="kpiLoss" class="text-xl sm:text-3xl font-bold mt-1.5 text-[#1E2226]">0,0092 МВт</div>
+        <div id="kpiLossSub" class="text-[11px] sm:text-xs text-[#5A544D] mt-1">I = 30,3 А · R = 10 Ом</div>
+      </div>
+
+      <div class="bg-[#262B31] text-[#F7F1E8] rounded-xl p-3 sm:p-4 border border-[#353C44]">
+        <span class="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-[#B8AEA2]">ККД лінії (η)</span>
+        <div id="kpiEff" class="text-xl sm:text-3xl font-bold mt-1.5 text-[#EFE5D8]">99,91%</div>
+        <div id="kpiEffSub" class="text-[11px] sm:text-xs text-[#B8AEA2] mt-1">Напруга: 330 кВ</div>
+      </div>
+    </section>
+
+    <!-- Банер аварійного повідомлення -->
+    <div id="alertBanner" class="hidden rounded-xl p-3.5 bg-[#A63A2B] text-[#F7F1E8] text-xs sm:text-sm font-medium flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <span id="alertText"></span>
+      <button type="button" id="btnEntsoeQuick" class="w-full sm:w-auto shrink-0 px-3.5 py-2 sm:py-1.5 rounded-lg bg-[#F7F1E8] text-[#1E2226] text-xs font-bold hover:bg-[#EFE5D8] transition">
+        Залучити ENTSO-E (+1 200 МВт)
+      </button>
+    </div>
+
+    <!-- Основна сітка -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+      <!-- Ліва колонка: пульт керування -->
+      <div class="lg:col-span-5 space-y-4">
+        <!-- Блок 1: Лінія електропередачі -->
+        <section class="bg-[#F7F1E8] rounded-xl p-3.5 sm:p-4 border border-[#DDD0BE] space-y-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#262B31]">1. Магістральна лінія (ЛЕП)</h2>
+            <span class="text-[11px] font-mono text-[#5C5145]">P_втр = P²·R / U²</span>
+          </div>
+
+          <div>
+            <div class="text-xs font-medium text-[#5A544D] mb-2">Клас напруги лінії (U):</div>
+            <div id="voltageButtons" class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-3 gap-2">
+              <button type="button" data-u="10" class="u-btn py-2.5 sm:py-1.5 rounded-lg text-xs font-bold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition">10 кВ</button>
+              <button type="button" data-u="35" class="u-btn py-2.5 sm:py-1.5 rounded-lg text-xs font-bold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition">35 кВ</button>
+              <button type="button" data-u="110" class="u-btn py-2.5 sm:py-1.5 rounded-lg text-xs font-bold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition">110 кВ</button>
+              <button type="button" data-u="220" class="u-btn py-2.5 sm:py-1.5 rounded-lg text-xs font-bold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition">220 кВ</button>
+              <button type="button" data-u="330" class="u-btn py-2.5 sm:py-1.5 rounded-lg text-xs font-bold bg-[#262B31] text-[#F7F1E8] transition">330 кВ</button>
+              <button type="button" data-u="750" class="u-btn py-2.5 sm:py-1.5 rounded-lg text-xs font-bold bg-[#E5D8C6] text-[#1E2226] hover:bg-[#D8C7B0] transition">750 кВ</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-2">
+              <label for="sliderR" class="font-medium text-[#1E2226]">Опір гілки ЛЕП (R)</label>
+              <span id="valR" class="font-bold text-[#262B31]">20 Ом (екв.: 10 Ом)</span>
+            </div>
+            <input id="sliderR" type="range" min="6" max="30" step="2" value="20" class="cursor-pointer" />
+          </div>
+
+          <div class="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="flex items-center gap-2.5 p-3 sm:p-2.5 rounded-lg bg-[#EFE5D8] border border-[#DDD0BE] cursor-pointer select-none">
+              <input id="toggleFault" type="checkbox" class="w-4 h-4 accent-[#A63A2B] shrink-0" />
+              <span class="text-xs font-semibold text-[#1E2226]">Обрив основної ЛЕП (R × 2)</span>
+            </label>
+            <label class="flex items-center gap-2.5 p-3 sm:p-2.5 rounded-lg bg-[#EFE5D8] border border-[#DDD0BE] cursor-pointer select-none">
+              <input id="toggleEntsoe" type="checkbox" class="w-4 h-4 accent-[#262B31] shrink-0" />
+              <span class="text-xs font-semibold text-[#1E2226]">Допомога ENTSO-E (+1,2 ГВт)</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Блок 2: Генерація та споживання -->
+        <section class="bg-[#F7F1E8] rounded-xl p-3.5 sm:p-4 border border-[#DDD0BE] space-y-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#262B31]">2. Баланс генерації та попиту</h2>
+            <span class="text-[11px] font-mono text-[#5C5145]">P_ген = P_спож + P_втр</span>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1.5">
+              <label for="sliderAes" class="font-medium">АЕС (базова генерація)</label>
+              <span id="valAes" class="font-bold">6 000 МВт</span>
+            </div>
+            <input id="sliderAes" type="range" min="0" max="10000" step="200" value="6000" class="cursor-pointer" />
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1.5">
+              <label for="sliderTes" class="font-medium">ТЕС і ТЕЦ (маневр)</label>
+              <span id="valTes" class="font-bold">2 500 МВт</span>
+            </div>
+            <input id="sliderTes" type="range" min="0" max="5000" step="100" value="2500" class="cursor-pointer" />
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1.5">
+              <label for="sliderGes" class="font-medium">ГЕС і ГАЕС (швидкий резерв)</label>
+              <span id="valGes" class="font-bold">1 200 МВт</span>
+            </div>
+            <input id="sliderGes" type="range" min="0" max="3000" step="100" value="1200" class="cursor-pointer" />
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1.5">
+              <label for="sliderVde" class="font-medium">СЕС і ВЕС (відновлювані)</label>
+              <span id="valVde" class="font-bold">1 000 МВт</span>
+            </div>
+            <input id="sliderVde" type="range" min="0" max="2500" step="100" value="1000" class="cursor-pointer" />
+          </div>
+
+          <div class="pt-2.5 border-t border-[#DDD0BE]">
+            <div class="flex justify-between text-xs mb-1.5">
+              <label for="sliderDemand" class="font-bold text-[#A63A2B]">Споживання міст і підприємств</label>
+              <span id="valDemand" class="font-bold text-[#A63A2B]">10 500 МВт</span>
+            </div>
+            <input id="sliderDemand" type="range" min="4000" max="16000" step="200" value="10500" class="cursor-pointer" />
+          </div>
+        </section>
+      </div>
+
+      <!-- Права колонка: жива схема + графіки -->
+      <div class="lg:col-span-7 space-y-4">
+        <!-- Інтерактивна SVG-схема (горизонтальна на ПК + вертикальна на телефоні) -->
+        <section class="bg-[#F7F1E8] rounded-xl p-3.5 sm:p-4 border border-[#DDD0BE]">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+            <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#262B31]">Схема передачі та кільцевого резервування</h2>
+            <span id="gridStatusText" class="text-xs font-semibold text-[#2E6B4E]">Обидві гілки кільця активні</span>
+          </div>
+
+          <!-- Горизонтальна схема (планшет / ПК) -->
+          <div class="hidden sm:block w-full">
+            <svg viewBox="0 0 680 185" class="w-full h-auto" role="img" aria-label="Схема передачі електроенергії в ОЕС України">
+              <path id="lineMain" d="M 220 75 Q 340 22 460 75" fill="none" stroke="#262B31" stroke-width="3.5" class="flow-active" />
+              <text id="labelMain" x="340" y="34" text-anchor="middle" font-size="11" font-weight="600" fill="#262B31">Основна ЛЕП · 330 кВ</text>
+
+              <path id="lineBackup" d="M 220 105 Q 340 158 460 105" fill="none" stroke="#5C5145" stroke-width="3" class="flow-active" />
+              <text id="labelBackup" x="340" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#5C5145">Резервна гілка кільця</text>
+
+              <line x1="115" y1="90" x2="165" y2="90" stroke="#262B31" stroke-width="3" />
+              <line x1="515" y1="90" x2="565" y2="90" stroke="#262B31" stroke-width="3" />
+
+              <rect x="12" y="52" width="104" height="76" rx="10" fill="#262B31" />
+              <text x="64" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#EFE5D8">ГЕНЕРАЦІЯ</text>
+              <text id="svgGenVal" x="64" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="#E5D8C6">10 700 МВт</text>
+              <text x="64" y="114" text-anchor="middle" font-size="10" fill="#B8AEA2">50 Гц</text>
+
+              <rect x="165" y="56" width="56" height="68" rx="10" fill="#E5D8C6" stroke="#5C5145" stroke-width="1.5" />
+              <circle cx="187" cy="90" r="10" fill="none" stroke="#262B31" stroke-width="2" />
+              <circle cx="199" cy="90" r="10" fill="none" stroke="#262B31" stroke-width="2" />
+              <text x="193" y="70" text-anchor="middle" font-size="9" font-weight="700" fill="#1E2226">ТП ↑</text>
+
+              <rect x="460" y="56" width="56" height="68" rx="10" fill="#E5D8C6" stroke="#5C5145" stroke-width="1.5" />
+              <circle cx="482" cy="90" r="10" fill="none" stroke="#262B31" stroke-width="2" />
+              <circle cx="494" cy="90" r="10" fill="none" stroke="#262B31" stroke-width="2" />
+              <text x="488" y="70" text-anchor="middle" font-size="9" font-weight="700" fill="#1E2226">ТП ↓</text>
+
+              <rect id="svgLoadBox" x="565" y="52" width="104" height="76" rx="10" fill="#353C44" />
+              <text x="617" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#EFE5D8">СПОЖИВАЧІ</text>
+              <text id="svgLoadVal" x="617" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="#E5D8C6">10 500 МВт</text>
+              <text id="svgLoadSub" x="617" y="114" text-anchor="middle" font-size="10" fill="#B8AEA2">380 / 220 В</text>
+
+              <g id="faultMarker" opacity="0">
+                <circle cx="340" cy="48" r="12" fill="#A63A2B" />
+                <text x="340" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">✕</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Вертикальна схема (телефон — без горизонтального скролу) -->
+          <div class="block sm:hidden w-full max-w-[300px] mx-auto">
+            <svg viewBox="0 0 300 310" class="w-full h-auto" role="img" aria-label="Мобільна схема передачі електроенергії">
+              <!-- Лінії від вузлів до ТП -->
+              <line x1="150" y1="62" x2="150" y2="82" stroke="#262B31" stroke-width="3" />
+              <line x1="150" y1="228" x2="150" y2="248" stroke="#262B31" stroke-width="3" />
+
+              <!-- Ліва основна дуга -->
+              <path id="mLineMain" d="M 122 114 Q 65 155 122 196" fill="none" stroke="#262B31" stroke-width="3.5" class="flow-active" />
+              <text id="mLabelMain" x="45" y="159" text-anchor="middle" font-size="11" font-weight="700" fill="#262B31">330 кВ</text>
+
+              <!-- Права резервна дуга -->
+              <path id="mLineBackup" d="M 178 114 Q 235 155 178 196" fill="none" stroke="#5C5145" stroke-width="3" class="flow-active" />
+              <text id="mLabelBackup" x="252" y="159" text-anchor="middle" font-size="11" font-weight="600" fill="#5C5145">Резерв</text>
+
+              <!-- Генерація -->
+              <rect x="65" y="8" width="170" height="54" rx="10" fill="#262B31" />
+              <text x="150" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="#EFE5D8">ГЕНЕРАЦІЯ · 50 Гц</text>
+              <text id="mSvgGenVal" x="150" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="#E5D8C6">10 700 МВт</text>
+
+              <!-- ТП ↑ -->
+              <rect x="115" y="82" width="70" height="32" rx="8" fill="#E5D8C6" stroke="#5C5145" stroke-width="1.5" />
+              <text x="150" y="102" text-anchor="middle" font-size="11" font-weight="700" fill="#1E2226">ТП ↑</text>
+
+              <!-- ТП ↓ -->
+              <rect x="115" y="196" width="70" height="32" rx="8" fill="#E5D8C6" stroke="#5C5145" stroke-width="1.5" />
+              <text x="150" y="216" text-anchor="middle" font-size="11" font-weight="700" fill="#1E2226">ТП ↓</text>
+
+              <!-- Споживачі -->
+              <rect id="mSvgLoadBox" x="65" y="248" width="170" height="54" rx="10" fill="#353C44" />
+              <text x="150" y="268" text-anchor="middle" font-size="11" font-weight="700" fill="#EFE5D8">СПОЖИВАЧІ</text>
+              <text id="mSvgLoadVal" x="150" y="286" text-anchor="middle" font-size="12" font-weight="700" fill="#E5D8C6">10 500 МВт</text>
+              <text id="mSvgLoadSub" x="150" y="298" text-anchor="middle" font-size="9.5" fill="#B8AEA2">380 / 220 В</text>
+
+              <!-- Значок обриву -->
+              <g id="mFaultMarker" opacity="0">
+                <circle cx="94" cy="155" r="11" fill="#A63A2B" />
+                <text x="94" y="159" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">✕</text>
+              </g>
+            </svg>
+          </div>
+        </section>
+
+        <!-- Графік із перемикачем вкладок -->
+        <section class="bg-[#F7F1E8] rounded-xl p-3.5 sm:p-4 border border-[#DDD0BE]">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <h2 id="chartTitle" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#262B31]">Крива теплових втрат P_втр(U) для 10 МВт</h2>
+            <div class="flex rounded-lg bg-[#E5D8C6] p-0.5 w-full sm:w-auto">
+              <button type="button" id="tabLoss" class="flex-1 sm:flex-none px-3 py-1.5 sm:py-1 rounded-md text-xs font-bold bg-[#262B31] text-[#F7F1E8] transition">Втрати I²R</button>
+              <button type="button" id="tabMix" class="flex-1 sm:flex-none px-3 py-1.5 sm:py-1 rounded-md text-xs font-bold text-[#1E2226] transition">Структура генерації</button>
+            </div>
+          </div>
+
+          <div class="relative h-60 sm:h-64">
+            <canvas id="mainChart"></canvas>
+          </div>
+
+          <div id="formulaNote" class="mt-3 text-xs text-[#5A544D] bg-[#EFE5D8] rounded-lg px-3 py-2 border border-[#DDD0BE]">
+            Формула: I = P / U, P_втр = I² · R_екв. Поточна точка на графіку підсвічена теракотовим маркером.
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
