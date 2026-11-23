@@ -1,15 +1,13 @@
 :root {
-  --bg-page: #F1F5F9;
-  --bg-card: #FFFFFF;
-  --bg-soft: #E2E8F0;
-  --border-soft: #CBD5E1;
-  --dark-slate: #0F172A;
-  --slate-mid: #1E293B;
-  --accent-blue: #2563EB;
-  --accent-blue-hover: #1D4ED8;
+  --bg-white: #FFFFFF;
+  --bg-subtle: #F9FAFB;
+  --bg-control: #F3F4F6;
+  --bg-control-hover: #E5E7EB;
+  --border-light: #E5E7EB;
+  --ink-black: #111827;
+  --ink-dark: #374151;
+  --ink-muted: #6B7280;
   --danger-red: #DC2626;
-  --text-main: #0F172A;
-  --text-muted: #475569;
 }
 
 html, body {
@@ -17,49 +15,99 @@ html, body {
 }
 
 body {
-  background-color: var(--bg-page) !important;
-  color: var(--text-main) !important;
+  background-color: var(--bg-subtle) !important;
+  color: var(--ink-black) !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Перекриття фонів і рамок із index.html */
-.bg-\[\#262B31\] { background-color: var(--dark-slate) !important; }
-.hover\:bg-\[\#353C44\]:hover { background-color: var(--slate-mid) !important; }
-.bg-\[\#F7F1E8\] { background-color: var(--bg-card) !important; }
-.bg-\[\#EFE5D8\] { background-color: var(--bg-page) !important; }
-.bg-\[\#E5D8C6\] { background-color: var(--bg-soft) !important; }
-.hover\:bg-\[\#D8C7B0\]:hover { background-color: #CBD5E1 !important; }
-.border-\[\#DDD0BE\] { border-color: var(--border-soft) !important; }
-.border-\[\#353C44\] { border-color: var(--slate-mid) !important; }
+/* Біла шапка та біла картка ККД */
+header.bg-\[\#262B31\] {
+  background-color: var(--bg-white) !important;
+  color: var(--ink-black) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+}
 
-/* Активні кнопки — чистий синій */
+header .text-\[\#F7F1E8\],
+header .text-\[\#EFE5D8\] {
+  color: var(--ink-black) !important;
+}
+
+header .text-\[\#B8AEA2\],
+header .text-\[\#C8BEB2\],
+header .text-\[\#9E958A\] {
+  color: var(--ink-muted) !important;
+}
+
+main section > div.bg-\[\#262B31\] {
+  background-color: var(--bg-white) !important;
+  color: var(--ink-black) !important;
+  border: 1.5px solid var(--ink-black) !important;
+}
+
+main section > div.bg-\[\#262B31\] .text-\[\#EFE5D8\],
+main section > div.bg-\[\#262B31\] .text-\[\#F7F1E8\] {
+  color: var(--ink-black) !important;
+}
+
+main section > div.bg-\[\#262B31\] .text-\[\#B8AEA2\] {
+  color: var(--ink-muted) !important;
+}
+
+/* Картки, фони та рамки */
+.bg-\[\#F7F1E8\] { background-color: var(--bg-white) !important; }
+.bg-\[\#EFE5D8\] { background-color: var(--bg-subtle) !important; }
+.bg-\[\#E5D8C6\] { background-color: var(--bg-control) !important; }
+.hover\:bg-\[\#D8C7B0\]:hover { background-color: var(--bg-control-hover) !important; }
+.border-\[\#DDD0BE\], .border-\[\#353C44\] { border-color: var(--border-light) !important; }
+
+/* Активні кнопки — контрастний чорний із білим текстом */
 .preset-btn.bg-\[\#262B31\],
 .u-btn.bg-\[\#262B31\],
 #tabLoss.bg-\[\#262B31\],
 #tabMix.bg-\[\#262B31\] {
-  background-color: var(--accent-blue) !important;
-  color: #FFFFFF !important;
+  background-color: var(--ink-black) !important;
+  color: var(--bg-white) !important;
 }
+
 .preset-btn.bg-\[\#262B31\]:hover {
-  background-color: var(--accent-blue-hover) !important;
+  background-color: var(--ink-dark) !important;
 }
 
-/* Кольори тексту */
-.text-\[\#1E2226\], .text-\[\#262B31\] { color: var(--text-main) !important; }
-.text-\[\#5A544D\], .text-\[\#5C5145\] { color: var(--text-muted) !important; }
-.text-\[\#EFE5D8\], .text-\[\#F7F1E8\] { color: #F8FAFC !important; }
-.text-\[\#B8AEA2\], .text-\[\#C8BEB2\], .text-\[\#9E958A\] { color: #94A3B8 !important; }
+/* Текст */
+.text-\[\#1E2226\], .text-\[\#262B31\] { color: var(--ink-black) !important; }
+.text-\[\#5A544D\], .text-\[\#5C5145\] { color: var(--ink-muted) !important; }
 
-/* Схема ЛЕП (SVG) */
-svg rect[fill="#262B31"] { fill: var(--dark-slate); }
-svg rect[fill="#353C44"] { fill: var(--slate-mid); }
-svg rect[fill="#E5D8C6"] { fill: var(--bg-soft); stroke: #64748B; }
-svg text[fill="#EFE5D8"], svg text[fill="#E5D8C6"] { fill: #F8FAFC; }
-svg text[fill="#B8AEA2"] { fill: #94A3B8; }
-svg text[fill="#262B31"], svg text[fill="#1E2226"] { fill: var(--text-main); }
-svg path[stroke="#262B31"], svg line[stroke="#262B31"] { stroke: var(--accent-blue); }
-svg path[stroke="#5C5145"] { stroke: #64748B; }
+/* Біла креслярська SVG-схема ЛЕП */
+svg rect[fill="#262B31"],
+svg rect[fill="#353C44"] {
+  fill: var(--bg-white);
+  stroke: var(--ink-black);
+  stroke-width: 1.8;
+}
+svg rect[fill="#E5D8C6"] {
+  fill: var(--bg-control);
+  stroke: #9CA3AF;
+}
+svg text[fill="#EFE5D8"],
+svg text[fill="#E5D8C6"],
+svg text[fill="#262B31"],
+svg text[fill="#1E2226"] {
+  fill: var(--ink-black);
+}
+svg text[fill="#B8AEA2"] {
+  fill: var(--ink-muted);
+}
+svg rect[fill="#A63A2B"] ~ text {
+  fill: var(--ink-black);
+}
+svg path[stroke="#262B31"],
+svg line[stroke="#262B31"] {
+  stroke: var(--ink-black);
+}
+svg path[stroke="#5C5145"] {
+  stroke: #9CA3AF;
+}
 
 /* Повзунки */
 input[type="range"] {
@@ -68,9 +116,9 @@ input[type="range"] {
   width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: var(--border-soft);
+  background: var(--border-light);
   outline: none;
-  accent-color: var(--accent-blue);
+  accent-color: var(--ink-black);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -79,9 +127,9 @@ input[type="range"]::-webkit-slider-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--accent-blue);
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.3);
+  background: var(--ink-black);
+  border: 2px solid var(--bg-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
 
@@ -89,9 +137,9 @@ input[type="range"]::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--accent-blue);
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.3);
+  background: var(--ink-black);
+  border: 2px solid var(--bg-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
 
