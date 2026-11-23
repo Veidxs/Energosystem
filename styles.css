@@ -1,12 +1,15 @@
 :root {
-  --bg-beige: #EFE5D8;
-  --bg-card: #F7F1E8;
-  --bg-tint: #E5D8C6;
-  --dark-slate: #262B31;
-  --slate-mid: #353C44;
-  --taupe: #5C5145;
-  --text-main: #1E2226;
-  --text-muted: #5A544D;
+  --bg-page: #F1F5F9;
+  --bg-card: #FFFFFF;
+  --bg-soft: #E2E8F0;
+  --border-soft: #CBD5E1;
+  --dark-slate: #0F172A;
+  --slate-mid: #1E293B;
+  --accent-blue: #2563EB;
+  --accent-blue-hover: #1D4ED8;
+  --danger-red: #DC2626;
+  --text-main: #0F172A;
+  --text-muted: #475569;
 }
 
 html, body {
@@ -14,22 +17,60 @@ html, body {
 }
 
 body {
-  background-color: var(--bg-beige);
-  color: var(--text-main);
+  background-color: var(--bg-page) !important;
+  color: var(--text-main) !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Зручні для пальця повзунки на телефоні */
+/* Перекриття фонів і рамок із index.html */
+.bg-\[\#262B31\] { background-color: var(--dark-slate) !important; }
+.hover\:bg-\[\#353C44\]:hover { background-color: var(--slate-mid) !important; }
+.bg-\[\#F7F1E8\] { background-color: var(--bg-card) !important; }
+.bg-\[\#EFE5D8\] { background-color: var(--bg-page) !important; }
+.bg-\[\#E5D8C6\] { background-color: var(--bg-soft) !important; }
+.hover\:bg-\[\#D8C7B0\]:hover { background-color: #CBD5E1 !important; }
+.border-\[\#DDD0BE\] { border-color: var(--border-soft) !important; }
+.border-\[\#353C44\] { border-color: var(--slate-mid) !important; }
+
+/* Активні кнопки — чистий синій */
+.preset-btn.bg-\[\#262B31\],
+.u-btn.bg-\[\#262B31\],
+#tabLoss.bg-\[\#262B31\],
+#tabMix.bg-\[\#262B31\] {
+  background-color: var(--accent-blue) !important;
+  color: #FFFFFF !important;
+}
+.preset-btn.bg-\[\#262B31\]:hover {
+  background-color: var(--accent-blue-hover) !important;
+}
+
+/* Кольори тексту */
+.text-\[\#1E2226\], .text-\[\#262B31\] { color: var(--text-main) !important; }
+.text-\[\#5A544D\], .text-\[\#5C5145\] { color: var(--text-muted) !important; }
+.text-\[\#EFE5D8\], .text-\[\#F7F1E8\] { color: #F8FAFC !important; }
+.text-\[\#B8AEA2\], .text-\[\#C8BEB2\], .text-\[\#9E958A\] { color: #94A3B8 !important; }
+
+/* Схема ЛЕП (SVG) */
+svg rect[fill="#262B31"] { fill: var(--dark-slate); }
+svg rect[fill="#353C44"] { fill: var(--slate-mid); }
+svg rect[fill="#E5D8C6"] { fill: var(--bg-soft); stroke: #64748B; }
+svg text[fill="#EFE5D8"], svg text[fill="#E5D8C6"] { fill: #F8FAFC; }
+svg text[fill="#B8AEA2"] { fill: #94A3B8; }
+svg text[fill="#262B31"], svg text[fill="#1E2226"] { fill: var(--text-main); }
+svg path[stroke="#262B31"], svg line[stroke="#262B31"] { stroke: var(--accent-blue); }
+svg path[stroke="#5C5145"] { stroke: #64748B; }
+
+/* Повзунки */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: #DDD0BE;
+  background: var(--border-soft);
   outline: none;
-  accent-color: #262B31;
+  accent-color: var(--accent-blue);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -38,9 +79,9 @@ input[type="range"]::-webkit-slider-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #262B31;
-  border: 2px solid #F7F1E8;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  background: var(--accent-blue);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.3);
   cursor: pointer;
 }
 
@@ -48,19 +89,14 @@ input[type="range"]::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #262B31;
-  border: 2px solid #F7F1E8;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  background: var(--accent-blue);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.3);
   cursor: pointer;
 }
 
-#sliderDemand::-webkit-slider-thumb {
-  background: #A63A2B;
-}
-
-#sliderDemand::-moz-range-thumb {
-  background: #A63A2B;
-}
+#sliderDemand::-webkit-slider-thumb { background: var(--danger-red); }
+#sliderDemand::-moz-range-thumb { background: var(--danger-red); }
 
 @keyframes flowDash {
   to {
